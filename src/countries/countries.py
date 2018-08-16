@@ -4,17 +4,6 @@ import math
 import operator
 
 
-columns_to_keep = [
-    'Country',
-    'GDP ($ per capita)',
-    'Literacy (%)',
-    'Region'
-]
-data = pd.read_csv('3-countries of the world-small-large_countries_only.csv')
-data = data[columns_to_keep]
-
-print(data.head())
-print(data)
 
 
 
@@ -48,6 +37,7 @@ def knn(training_set, test_instance, k):
     #### End of STEP 3.2
 
     neighbors = []
+    neighbors_names = []
 
     #### Start of STEP 3.3
     # Extracting top k neighbors
@@ -56,10 +46,13 @@ def knn(training_set, test_instance, k):
     #### End of STEP 3.3
     classVotes = {}
 
+    print(neighbors)
+
     #### Start of STEP 3.4
     # Calculating the most freq class in the neighbors
     for x in range(len(neighbors)):
         response = training_set.iloc[neighbors[x]][-1]
+        neighbors_names.append([training_set.iloc[neighbors[x]].name, training_set.iloc[neighbors[x]][-1]])
 
         if response in classVotes:
             classVotes[response] += 1
@@ -69,11 +62,47 @@ def knn(training_set, test_instance, k):
 
     #### Start of STEP 3.5
     sortedVotes = sorted(classVotes.items(), key=operator.itemgetter(1), reverse=True)
-    return (sortedVotes[0][0], neighbors)
+    return (sortedVotes[0][0], neighbors, neighbors_names)
     #### End of STEP 3.5
 
 
 
 # Creating a dummy testset
-testSet = [[5000, 85]]
+testSet = [[50000, 85.5]]
 test = pd.DataFrame(testSet)
+
+
+
+columns_to_keep = [
+    'GDP ($ per capita)',
+    'Literacy (%)',
+    'Region'
+]
+data = pd.read_csv('5-countries of the world-A-H.csv',index_col=0)
+data = data[columns_to_keep]
+# print(data.head())
+# print(data.loc['China'].name)
+# print(data)
+
+# print(test.shape[1])
+# print(test[0])
+# print(test[1])
+# print(data.iloc[0][0])
+# print(data.iloc[0][1])
+# print(data.iloc[2])
+# print(data.iloc[3])
+
+
+#### Start of STEP 2
+# Setting number of neighbors = 1
+k = 7
+#### End of STEP 2
+# Running KNN model
+result,neigh,neigh_names = knn(data, test, k)
+
+# Predicted class
+print(result)
+print(neigh)
+print(neigh_names)
+
+
