@@ -61,12 +61,12 @@ from sklearn import decomposition, preprocessing
 df_f_fa_n = preprocessing.scale(df_f_fa) # data normalisation attempt
 
 from sklearn.decomposition import PCA
-pca = PCA(n_components=2)
+pca = PCA(n_components=3)
 principal_components = pca.fit_transform(df_f_fa_n)
 # print(df[['birth_state']])
 # print(len(principal_components))
 
-pc_ = ['pc1', 'pc2']
+pc_ = ['pc1', 'pc2', 'pc3']
 principal_df = pd.DataFrame(data=principal_components, columns=pc_)
 birth_state_df = pd.DataFrame(data=df[['birth_state']].values, columns=['birth_state'])
 final_df = pd.concat(objs=[principal_df, birth_state_df], axis=1)
@@ -84,23 +84,27 @@ X_train, X_test, y_train, y_test = train_test_split(final_df[pc_].values,
                                                     test_size=0.8,
                                                     random_state=42)
 
-print('a')
-print(X_train)
-print('b')
-print(X_test)
-print('c')
-print(y_train)
-print('e')
-print(np.array(y_train)[:,0])
-print('d')
-print(y_test)
-print('e')
 
 ## Import the Classifier.
 from sklearn.neighbors import KNeighborsClassifier
-## Instantiate the model with 5 neighbors.
-knn = KNeighborsClassifier(n_neighbors=5)
-## Fit the model on the training data.
-knn.fit(X_train, np.array(y_train)[:,0])
-## See how the model performs on the test data.
-print(knn.score(X_test, np.array(y_test)[:,0]))
+
+train_test_df = pd.DataFrame(columns=['knn', 'percent'])
+# train_test_df = train_test_df.append({'knn': 0, 'percent':0}, ignore_index=True)
+
+
+
+
+
+for n_neighbors_value in range(1,100):
+    ## Instantiate the model with 5 neighbors.
+    knn = KNeighborsClassifier(n_neighbors=n_neighbors_value)
+    ## Fit the model on the training data.
+    knn.fit(X_train, np.array(y_train)[:,0])
+    ## See how the model performs on the test data.
+    score = knn.score(X_test, np.array(y_test)[:, 0])
+    train_test_df = train_test_df.append({'knn': n_neighbors_value, 'percent':score}, ignore_index=True)
+
+# print(train_test_df)
+print(train_test_df['percent'].idxmax())
+print()
+print(train_test_df.loc[train_test_df['percent'].idxmax()])
