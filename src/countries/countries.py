@@ -71,16 +71,14 @@ def knn(training_set, test_instance, k):
 testSet = [[50000, 85.5]]
 test = pd.DataFrame(testSet)
 
-
-
 columns_to_keep = [
     'GDP ($ per capita)',
     'Literacy (%)',
     'Region'
 ]
-data = pd.read_csv('5-countries of the world-A-H.csv',index_col=0)
+data = pd.read_csv('4-countries of the world-whitespace_cleanup.csv',index_col=0)
 data = data[columns_to_keep]
-# print(data.head())
+print(data[['GDP ($ per capita)', 'Literacy (%)']].head())
 # print(data.loc['China'].name)
 # print(data)
 
@@ -93,16 +91,16 @@ data = data[columns_to_keep]
 # print(data.iloc[3])
 
 
-#### Start of STEP 2
-# Setting number of neighbors = 1
-k = 7
-#### End of STEP 2
-# Running KNN model
-result,neigh,neigh_names = knn(data, test, k)
-
-# Predicted class
-print(result)
-print(neigh)
-print(neigh_names)
+# #### Start of STEP 2
+# # Setting number of neighbors = 1
+# k = 7
+# #### End of STEP 2
+# # Running KNN model
+# result,neigh,neigh_names = knn(data, test, k)
+#
+# # Predicted class
+# print(result)
+# print(neigh)
+# print(neigh_names)
 
 
