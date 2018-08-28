@@ -81,7 +81,7 @@ final_df = pd.concat(objs=[principal_df, birth_state_df], axis=1)
 from sklearn.model_selection import train_test_split
 X_train, X_test, y_train, y_test = train_test_split(final_df[pc_].values,
                                                     final_df[['birth_state']].values,
-                                                    test_size=0.8,
+                                                    train_size=0.8,
                                                     random_state=42)
 
 
