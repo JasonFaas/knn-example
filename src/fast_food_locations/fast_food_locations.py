@@ -19,14 +19,19 @@ ffl_data = ffl_data.drop(ffl_data[ffl_data['longitude'] < -130].index)
 ffl_data = ffl_data.drop(ffl_data[ffl_data['latitude'] < 22].index)
 
 
-#utilize only top 2 restaurants
+#utilize only top restaurants
+restaurant_count = 3
 name_dict = {}
 for ffl_lab, ffl_row in ffl_data.iterrows():
     name_dict[ffl_row['name']] = name_dict.get(ffl_row['name'], 0) + 1
 name_sorted_desc = sorted(name_dict.items(), key=operator.itemgetter(1), reverse=True)
-names_top_2 = (name_sorted_desc[0][0], name_sorted_desc[1][0])
 
-two_restaurants = ffl_data[np.logical_or(ffl_data['name'] == names_top_2[0], ffl_data['name'] == names_top_2[1])]
+logical_or_hold = ffl_data['name'] == name_sorted_desc[0][0]
+for restaurant in range(1, restaurant_count):
+    logical_or_hold = np.logical_or(logical_or_hold, ffl_data['name'] == name_sorted_desc[restaurant][0])
+    print(type(logical_or_hold))
+
+two_restaurants = ffl_data[logical_or_hold]
 
 
 
@@ -47,18 +52,16 @@ import matplotlib.pyplot as plt
 fig = plt.figure()
 ax = fig.add_subplot(1, 1, 1)
 
-ax.scatter(x_df.loc[y_df['name'] == names_top_2[0], 'longitude'],
-           x_df.loc[y_df['name'] == names_top_2[0], 'latitude'],
-           c = 'r',
-           s = 50,
-           alpha=.5)
-ax.scatter(x_df.loc[y_df['name'] == names_top_2[1], 'longitude'],
-           x_df.loc[y_df['name'] == names_top_2[1], 'latitude'],
-           c = 'g',
-           s = 50,
-           alpha=.5)
+
+colors = ['r', 'g', 'b']
+for restaurant in range(0, restaurant_count):
+    ax.scatter(x_df.loc[y_df['name'] == name_sorted_desc[restaurant][0], 'longitude'],
+               x_df.loc[y_df['name'] == name_sorted_desc[restaurant][0], 'latitude'],
+               c = colors[restaurant],
+               s = 50,
+               alpha=.5)
 ax.grid()
-# plt.show()
+plt.show()
 
 # print(x)
 
@@ -80,13 +83,11 @@ x_train, x_test, y_train, y_test = train_test_split(formatted_data[coordinates].
 
 def myawesomefunction(array_of_distances):
     list_of_nearest_distances = np.array([])
+    neighbors = len(array_of_distances[0])
     for distance_arr in array_of_distances:
-        list_of_nearest_distances = np.append(list_of_nearest_distances, [distance_arr[3]])
+        list_of_nearest_distances = np.append(list_of_nearest_distances, [distance_arr[4]])
 
-    std = np.std(list_of_nearest_distances)
     average = np.average(list_of_nearest_distances)
-
-    #TODO implement this weighting function
 
     neighbors = len(array_of_distances[0])
     new_return = np.empty((0, neighbors), float)
@@ -98,7 +99,7 @@ def myawesomefunction(array_of_distances):
             if distance_elm < average:
                 next_array = np.append([distance_elm], next_array)
             else:
-                next_array = np.append(next_array, [distance_elm * 2])
+                next_array = np.append(next_array, [distance_elm])
         new_return = np.append(new_return, np.array([next_array]), axis=0)
     return new_return
 
@@ -107,7 +108,7 @@ from sklearn.neighbors import KNeighborsClassifier
 scores = {}
 for neighbor_itr in range(5,40):
     # print(neighbor_itr)
-    knn = KNeighborsClassifier(n_neighbors=neighbor_itr, weights=myawesomefunction)
+    knn = KNeighborsClassifier(n_neighbors=neighbor_itr)#, weights=myawesomefunction)
     knn.fit(x_train, y_train.ravel())
     pred = knn.predict(x_test)
     score_v1 = accuracy_score(y_test.ravel(), pred)
