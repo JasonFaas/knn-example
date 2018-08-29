@@ -79,8 +79,12 @@ x_train, x_test, y_train, y_test = train_test_split(formatted_data[coordinates].
 # print(x_train)
 
 def myawesomefunction(array_of_distances):
-    std = np.std(array_of_distances)
-    average = np.average(array_of_distances)
+    list_of_nearest_distances = np.array([])
+    for distance_arr in array_of_distances:
+        list_of_nearest_distances = np.append(list_of_nearest_distances, [distance_arr[3]])
+
+    std = np.std(list_of_nearest_distances)
+    average = np.average(list_of_nearest_distances)
 
     #TODO implement this weighting function
 
@@ -89,15 +93,19 @@ def myawesomefunction(array_of_distances):
     for distance_arr in array_of_distances:
         next_array = np.array([])
         for distance_elm in distance_arr:
-            updated_distance_here = average + ((distance_elm - average) / std) ** 2 * (distance_elm - average)
-            next_array = np.append(next_array, [updated_distance_here])
+            # updated_distance_here = average + ((distance_elm - average) / std) ** 2 * (distance_elm - average)
+            # updated_distance_here = distance_elm * 2
+            if distance_elm < average:
+                next_array = np.append([distance_elm], next_array)
+            else:
+                next_array = np.append(next_array, [distance_elm * 2])
         new_return = np.append(new_return, np.array([next_array]), axis=0)
     return new_return
 
 #Scoring using KNN
 from sklearn.neighbors import KNeighborsClassifier
 scores = {}
-for neighbor_itr in range(1,30):
+for neighbor_itr in range(5,40):
     # print(neighbor_itr)
     knn = KNeighborsClassifier(n_neighbors=neighbor_itr, weights=myawesomefunction)
     knn.fit(x_train, y_train.ravel())
