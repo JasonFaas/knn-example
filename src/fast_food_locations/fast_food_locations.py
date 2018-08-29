@@ -82,9 +82,6 @@ def myawesomefunction(array_of_distances):
     std = np.std(array_of_distances)
     average = np.average(array_of_distances)
 
-    new_array = np.empty(0)
-    for value in array_of_distances:
-        new_array = np.append(new_array, [average + ((value - average) / std) ** 2 * (value - average)])
     #TODO implement this weighting function
 
     neighbors = len(array_of_distances[0])
@@ -92,7 +89,7 @@ def myawesomefunction(array_of_distances):
     for distance_arr in array_of_distances:
         next_array = np.array([])
         for distance_elm in distance_arr:
-            updated_distance_here = distance_elm
+            updated_distance_here = average + ((distance_elm - average) / std) ** 2 * (distance_elm - average)
             next_array = np.append(next_array, [updated_distance_here])
         new_return = np.append(new_return, np.array([next_array]), axis=0)
     return new_return
@@ -100,7 +97,7 @@ def myawesomefunction(array_of_distances):
 #Scoring using KNN
 from sklearn.neighbors import KNeighborsClassifier
 scores = {}
-for neighbor_itr in range(1,100):
+for neighbor_itr in range(1,30):
     # print(neighbor_itr)
     knn = KNeighborsClassifier(n_neighbors=neighbor_itr, weights=myawesomefunction)
     knn.fit(x_train, y_train.ravel())
